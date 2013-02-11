@@ -14,8 +14,7 @@ end
 Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
   #  ensure that that e1 occurs before e2.
   #  page.body is the entire content of the page as a string.
-  rows = find("table#movies").find('tbody').all('tr')
-  contents = rows.map { |r| r.all('th,td').map { |c| c.text.strip } }
+  page.body.index(e1).should < page.body.index(e2)
 end
 
 # Make it easier to express checking or unchecking several boxes at once
@@ -28,10 +27,10 @@ When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
   #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
   rating_list.split(',').each do |rating|
     r = rating.strip
-  	if uncheck
-		step %{I uncheck \"ratings_#{r}\"}
+	if uncheck then
+	    step %{I uncheck "ratings_#{r}"}
 	else
-		step %{I check \"ratings_#{r}\"}
+		step %{I check "ratings_#{r}"}
 	end
   end
 end
@@ -40,15 +39,11 @@ Then /^I should see movies with ratings: (.*)/ do |rating_list|
   rows = find("table#movies").find('tbody').all('tr')
   contents = rows.map { |r| r.all('th,td').map { |c| c.text.strip } }
   extras = contents.reject do |elt|
+       puts elt
        rating_list.include? elt[1]
    end
 
-   extras == nil
-end
-
-Then /^I should see no movies/ do 
-	rows = find("table#movies").find('tbody').all('tr')
-	rows.count.should == Movie.all.count
+   assert extras.empty?
 end
 
 Then /^I should see all of the movies$/ do	
