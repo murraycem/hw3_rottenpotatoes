@@ -25,4 +25,32 @@ When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
   # HINT: use String#split to split up the rating_list, then
   #   iterate over the ratings and reuse the "When I check..." or
   #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
+  rating_list.split(',').each do |rating|
+    r = rating.strip
+  	if uncheck
+		step %{I uncheck \"ratings_#{r}\"}
+	else
+		step %{I check \"ratings_#{r}\"}
+	end
+  end
+end
+
+Then /^I should see movies with ratings: (.*)/ do |rating_list|
+  rows = find("table#movies").find('tbody').all('tr')
+  contents = rows.map { |r| r.all('th,td').map { |c| c.text.strip } }
+  extras = contents.reject do |elt|
+       rating_list.include? elt[1]
+   end
+
+   extras == nil
+end
+
+Then /^I should see no movies/ do 
+	rows = find("table#movies").find('tbody').all('tr')
+	rows.count.should == 10
+end
+
+Then /^I should see all of the movies$/ do	
+  rows = find("table#movies").find('tbody').all('tr')
+  rows.count.should == 10
 end
