@@ -14,7 +14,8 @@ end
 Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
   #  ensure that that e1 occurs before e2.
   #  page.body is the entire content of the page as a string.
-  flunk "Unimplemented"
+  rows = find("table#movies").find('tbody').all('tr')
+  contents = rows.map { |r| r.all('th,td').map { |c| c.text.strip } }
 end
 
 # Make it easier to express checking or unchecking several boxes at once
@@ -47,10 +48,10 @@ end
 
 Then /^I should see no movies/ do 
 	rows = find("table#movies").find('tbody').all('tr')
-	rows.count.should == 10
+	rows.count.should == Movie.all.count
 end
 
 Then /^I should see all of the movies$/ do	
   rows = find("table#movies").find('tbody').all('tr')
-  rows.count.should == 10
+  rows.count.should == Movie.all.count
 end
